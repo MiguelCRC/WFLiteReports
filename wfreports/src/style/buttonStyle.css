@@ -1,0 +1,91 @@
+button {
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 64px;
+  width: 200px;
+  border: 0;
+  border-radius: 10px;
+  font-family: Poppins;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: left;
+  background: #20bf55;
+  color: #f9f9f9;
+  cursor: pointer;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(25px);
+  }
+  100% {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes spin {
+  100% {
+    rotate: 1turn;
+  }
+}
+
+button > :is(span, img) {
+  position: relative;
+  z-index: 3;
+}
+
+button > span:last-child {
+  width: 106px;
+}
+
+button img {
+  width: 26px;
+  height: 26px;
+}
+
+button::before,
+button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 300%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+button::before {
+  z-index: 1;
+  background: #20bf55
+    repeating-linear-gradient(
+      60deg,
+      transparent,
+      transparent 10px,
+      #63d471 10px,
+      #63d471 20px
+    );
+}
+
+button::after {
+  z-index: 2;
+  background: linear-gradient(transparent, #20bf55 90%);
+}
+
+button.loading::before,
+button.loading::after {
+  opacity: 1;
+}
+
+button.loading::before {
+  animation: loading 0.7s infinite linear;
+}
+
+button.loading img {
+  animation: spin 1s infinite linear;
+}

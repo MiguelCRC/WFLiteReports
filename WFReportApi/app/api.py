@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from decouple import config
 import mysql.connector
 import datetime
 
@@ -8,15 +9,15 @@ app = FastAPI()
 
 
 database_connection = mysql.connector.connect(
-    host= "tc.crc.global",
-    user= "maae",
-    password= "APykdhWtp%@F2xrT",
-    database= "dockschedule",)
+    host= config('DB_HOST'),
+    user= config('DB_USERNAME'),
+    password= config('DB_PASSWORD'),
+    database= config('DB_NAME'))
 cursor = database_connection.cursor()
   
 origins = [
-    "http://localhost:3000",
-    "localhost:3000"
+    config('ORIGIN_1'),
+    config('ORIGIN_2')
 ]
 
 app.add_middleware(
@@ -37,13 +38,11 @@ async def report_inbound(
     endDate: str = datetime.date.today()) -> dict:
     database_connection.ping(reconnect=True)
     try:
-        query = ("SELECT bol, scheduledate, sendtodoorts, arrivedts, podsignrequests," 
-                "departedts, podsigned, driverphone FROM schedule "
-                "WHERE scheduledate BETWEEN %s AND %s ")
+        query = (config('QUERY_INBOUND'))
         cursor.execute(query, (startDate, endDate))
         
         data = []
-        for (bol, scheduledate, sendtodoorts, arrivedts, podsignrequests, departedts, podsigned, driverphone) in cursor:
+        for (bol, scheduledate, sendtodoorts, arrivedts, podsignrequests, departedts, podsigned, facilityName, driverphone) in cursor:
             data.append({
             "bol": bol,
             "scheduledate": scheduledate,
@@ -52,7 +51,30 @@ async def report_inbound(
             "podsignrequests": podsignrequests,
             "departedts": departedts,
             "podsigned": podsigned,
+            "facilityName": facilityName,
             "driverphone": driverphone
+            })
+        return {"data": data}
+    except RequestValidationError as exc:
+        return {"error": exc}
+    
+@app.get("/scanning", tags=["scanning"])
+async def report_scanning(
+    startDate: str= datetime.date.today(), 
+    endDate: str= datetime.date.today) -> dict:
+    database_connection.ping(reconnect=True)
+    try:
+        query = (config('QUERY_SCANNING'))
+        cursor.execute(query,  (startDate, endDate))
+        data = []
+        for(bol, full_name, arrivedts, tplroll, whenclosed, facilityName) in cursor:
+            data.append({
+                "bol":bol,
+                "fullName": full_name,
+                "arrivedts": arrivedts,
+                "tplroll": tplroll,
+                "whenclosed": whenclosed,
+                "facilityName": facilityName
             })
         return {"data": data}
     except RequestValidationError as exc:

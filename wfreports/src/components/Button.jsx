@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../style/buttonStyle.css";
 import icon from "../icons/reload.svg";
-import { CSVLink, CSVDownload } from "react-csv";
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+import { CSVLink } from "react-csv";
 
 export const Button = (props) => {
   const [isLoading, setIsLoading] = useState(false);

@@ -30,7 +30,7 @@ Set of automatic reports and downloads for Wareflex Lite for the analysis and im
 
 ![Home Page](wfreports/src/screenshots/home.png "Home Page")]
 
-![E-Signature Page](wfreports/src/screenshots/esignarure.png "E-Signature Page")]
+![E-Signature Page](wfreports/src/screenshots/esignature.png "E-Signature Page")]
 
 ![Scanning Page](wfreports/src/screenshots/scanning.png "Scanning Page")]
 

@@ -1,3 +1,4 @@
 {
-  "python.analysis.extraPaths": ["./WFReportApi/app"]
+  "python.analysis.extraPaths": ["./WFReportApi/app"],
+  "zenMode.fullScreen": false
 }

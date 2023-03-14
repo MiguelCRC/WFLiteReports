@@ -19,16 +19,16 @@ export const Button = (props) => {
     var response;
     var answer;
     setIsLoading(true);
-    if (props.report === "inbound") {
+    if (props.report === "esignature") {
       response = await fetch(
-        `http://localhost:8000/inbounds/?startDate=${props.startDate}&endDate=${props.endDate}`
+        `http://localhost:8081/esignature/?startDate=${props.startDate}&endDate=${props.endDate}`
       );
       answer = await response.json();
       setData(answer.data);
       setIsLoading(false);
     } else if (props.report === "scanning") {
       response = await fetch(
-        `http://localhost:8000/scanning/?startDate=${props.startDate}&endDate=${props.endDate}`
+        `http://localhost:8081/scanning/?startDate=${props.startDate}&endDate=${props.endDate}`
       );
       answer = await response.json();
       setData(answer.data);

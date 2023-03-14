@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
-import Button from "../components/Button";
+import Button from "./Button";
 import moment from "moment";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-const Inbound = () => {
+const Esignature = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   return (
     <div>
-      <h2>INBOUNDS</h2>
+      <h2>E-Signature</h2>
       <p>Please select the intial date and the end date for this report.</p>
       <div className="container text-center">
         <div className="row">
@@ -34,7 +34,7 @@ const Inbound = () => {
         <div className="row justify-content-md-center button-row">
           <div className="col-md-auto">
             <Button
-              report="inbound"
+              report="esignature"
               startDate={moment(startDate).format("YYYY-MM-DD")}
               endDate={moment(endDate).format("YYYY-MM-DD")}
             />
@@ -45,4 +45,4 @@ const Inbound = () => {
   );
 };
 
-export default Inbound;
+export default Esignature;

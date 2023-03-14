@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Routes, Route, NavLink, HashRouter } from "react-router-dom";
 import Home from "./Home";
-import Inbound from "./Inbound";
+import Esignature from "./Esignature";
 import Scanning from "./Scanning";
 
 class Main extends Component {
@@ -15,7 +15,7 @@ class Main extends Component {
               <NavLink to="/">Home</NavLink>
             </li>
             <li>
-              <NavLink to="inbound">Inbound</NavLink>
+              <NavLink to="esignature">E-Signature</NavLink>
             </li>
             <li>
               <NavLink to="scanning">Scanning</NavLink>
@@ -24,7 +24,7 @@ class Main extends Component {
           <div className="content">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/inbound" element={<Inbound />} />
+              <Route path="/esignature" element={<Esignature />} />
               <Route path="/scanning" element={<Scanning />} />
             </Routes>
           </div>

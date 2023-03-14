@@ -33,13 +33,13 @@ async def read_root() -> dict:
     return {"message": "Welcome to WF API."}
 
 
-@app.get("/inbounds", tags=["inbounds"])
+@app.get("/esignature", tags=["esignature"])
 async def report_inbound(
         startDate: str = datetime.date.today(),
         endDate: str = datetime.date.today()) -> dict:
     database_connection.ping(reconnect=True)
     try:
-        query = (config('QUERY_INBOUND'))
+        query = (config('QUERY_ESIGNATURE'))
         cursor.execute(query, (startDate, endDate))
 
         data = []

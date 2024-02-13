@@ -4,6 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from decouple import config
 import mysql.connector
 import datetime
+import httpx
 
 app = FastAPI()
 
@@ -64,20 +65,79 @@ async def report_inbound(
 async def report_scanning(
         startDate: str = datetime.date.today(),
         endDate: str = datetime.date.today) -> dict:
-    database_connection.ping(reconnect=True)
     try:
-        query = (config('QUERY_SCANNING'))
-        cursor.execute(query,  (startDate, endDate))
-        data = []
-        for (bol, full_name, arrivedts, tplroll, whenclosed, facilityName) in cursor:
-            data.append({
-                "bol": bol,
-                "fullName": full_name,
-                "arrivedts": arrivedts,
-                "tplroll": tplroll,
-                "whenclosed": whenclosed,
-                "facilityName": facilityName
-            })
+        token =  get_tplToken()
+        headers = {
+            'Host': config('TPL_HOST'),
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/json; charset=utf-8',
+            'Accept': 'application/json',
+            'Authorization': token,
+            'Accept-Encoding': 'gzip,deflate,sdch',
+            'Accept-Language': 'en-US,en;q=0.8'
+        }
+        users = get_tplUsers(headers)
+        facilities = get_tplFacilities(headers)
+        data=[]
+        for warehouse in facilities:
+            whId = warehouse['FacilityId']
+            print(startDate)
+            print(endDate)
+            if not warehouse['Deactivated']:
+                tplInbounds = (httpx.get(f"https://{config('TPL_HOST')}/inventory/receivers?pgsiz=500&rql=ReadOnly.FacilityIdentifier.id=={whId};ReadOnly.Status==1;arrivalDate=ge={startDate};arrivalDate=lt={endDate}", headers=headers, timeout=None)).json()
+                for inbound in tplInbounds["ResourceList"]:
+                    data.append({
+                        "bol": inbound.get('PoNum',''),
+                        "arrivedts": inbound.get("ArrivalDate",None),
+                        "fullName": inbound['ReadOnly']['LastModifiedByIdentifier']['Name'],
+                        "customer": inbound['ReadOnly']['CustomerIdentifier']['Name'],
+                        "tplRoll":users[inbound['ReadOnly']['LastModifiedByIdentifier']['Id']],
+                        "facilityName": inbound['ReadOnly']['FacilityIdentifier']['Name']
+                    })
         return {"data": data}
+    except RequestValidationError as exc:
+        return {"error": exc}
+    
+
+def get_tplToken():
+    headers = {
+        'Host': config('TPL_HOST'),
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json',
+        'Authorization': config('TPL_AUTHORIZATION'),
+        'Accept-Encoding': 'gzip,deflate,sdch',
+        'Accept-Language': 'en-US,en;q=0.8'
+        }
+    try:
+        response = ( httpx.post(config('TPL_URL'), headers=headers, data=config('TPL_PAYLOAD'))).json()
+        return (response["token_type"]+" "+response["access_token"])
+    except RequestValidationError as exc:
+        return {"error": exc}
+    
+
+def get_tplUsers(headers):
+    i=1
+    userRolDict={}
+    while i:
+        try:
+            response = (httpx.get(f"https://{config('TPL_HOST')}/uiproperties/users?pgnum={i}", headers = headers)).json()
+            if(response["ResourceList"]):
+                i=i+1  
+            else:
+                break
+        except RequestValidationError as exc:
+            return {"error": exc}
+    
+        for tplUser in response["ResourceList"]:
+            if(tplUser["UiRoleIdentifiers"] and tplUser["FacilityIdentifiers"]):
+                userRolDict[tplUser["UserId"]]=tplUser["UiRoleIdentifiers"][0]["Name"]
+                
+    return (userRolDict)
+
+def get_tplFacilities(headers):
+    try:
+        facilityDict = (httpx.get(f"https://{config('TPL_HOST')}/properties/facilities", headers=headers, timeout=None)).json()
+        return facilityDict["ResourceList"]
     except RequestValidationError as exc:
         return {"error": exc}

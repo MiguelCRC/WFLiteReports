@@ -35,8 +35,8 @@ const Scanning = () => {
           <div className="col-md-auto">
             <Button
               report="scanning"
-              startDate={moment(startDate).format("YYYY-MM-DD")}
-              endDate={moment(endDate).format("YYYY-MM-DD")}
+              startDate={moment(startDate).format("YYYY-MM-DDT00:00:00")}
+              endDate={moment(endDate).format("YYYY-MM-DDT23:59:00")}
             />
           </div>
         </div>

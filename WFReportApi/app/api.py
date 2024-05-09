@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from decouple import config
 import mysql.connector
-import datetime
+from datetime import *
 import httpx
 
 app = FastAPI()
@@ -36,8 +36,8 @@ async def read_root() -> dict:
 
 @app.get("/esignature", tags=["esignature"])
 async def report_inbound(
-        startDate: str = datetime.date.today(),
-        endDate: str = datetime.date.today()) -> dict:
+        startDate: str = datetime.date,
+        endDate: str = datetime.date) -> dict:
     database_connection.ping(reconnect=True)
     try:
         query = (config('QUERY_ESIGNATURE'))
@@ -63,8 +63,8 @@ async def report_inbound(
 
 @app.get("/scanning", tags=["scanning"])
 async def report_scanning(
-        startDate: str = datetime.date.today(),
-        endDate: str = datetime.date.today) -> dict:
+        startDate: str = datetime.date,
+        endDate: str = datetime.date) -> dict:
     try:
         token =  get_tplToken()
         headers = {
@@ -81,8 +81,6 @@ async def report_scanning(
         data=[]
         for warehouse in facilities:
             whId = warehouse['FacilityId']
-            print(startDate)
-            print(endDate)
             if not warehouse['Deactivated']:
                 tplInbounds = (httpx.get(f"https://{config('TPL_HOST')}/inventory/receivers?pgsiz=500&rql=ReadOnly.FacilityIdentifier.id=={whId};ReadOnly.Status==1;arrivalDate=ge={startDate};arrivalDate=lt={endDate}", headers=headers, timeout=None)).json()
                 for inbound in tplInbounds["ResourceList"]:
@@ -98,6 +96,42 @@ async def report_scanning(
     except RequestValidationError as exc:
         return {"error": exc}
     
+@app.get("/timeSite", tags=["timeSites"])
+async def report_siteTime(direction: str='Outbound',startDate: str=datetime.date, endDate: str=datetime.date) -> dict:
+    database_connection.ping(reconnect=True)
+    warehouseId=0
+    data=[]
+    for id in range (1,20):
+        warehouseId=id
+        try:
+            query=(config('QUERY_TIMESITE'))
+            cursor.execute(query,(warehouseId,direction,warehouseId,startDate,endDate,direction,warehouseId,startDate,endDate,))
+            for(bol, warehouse, longTime) in cursor:
+                data.append({"bol": bol, "warehouse": warehouse, "LongTime": str(longTime)})
+        except RequestValidationError as exc:
+            return {"error": exc}
+    return {"data": data}
+        
+
+@app.get("/avgTime", tags=["avgTime"])
+async def report_avgTime(direction: str='Outbound', startDate: str=datetime.date, endDate: str=datetime.date)-> dict:
+    database_connection.ping(reconnect=True)
+    warehouseId=0
+    data=[]
+    for id in range(1,20):
+        try:
+            warehouseId=id
+            query=(config('QUERY_AVGTIME'))
+            cursor.execute(query,(warehouseId,direction,warehouseId,startDate,endDate,))
+            for(warehouse, avgTime) in cursor:
+                if(avgTime):
+                    hours = int(avgTime/3600)
+                    minutes = ((avgTime/3600)*60) % 60
+                    seconds = ((avgTime/3600)*3600) % 60
+                    data.append({"warehouse": warehouse, "AvgTime": "%02d:%02d:%02d" % (hours, minutes, seconds)})
+        except RequestValidationError as exc:
+            return {"error": exc}
+    return {"data": data}
 
 def get_tplToken():
     headers = {

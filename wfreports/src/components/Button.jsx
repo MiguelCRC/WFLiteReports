@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "../style/buttonStyle.css";
 import icon from "../icons/reload.svg";
 import { CSVLink } from "react-csv";
+import { toast } from "react-toastify";
 
 export const Button = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,19 +21,93 @@ export const Button = (props) => {
     var answer;
     setIsLoading(true);
     if (props.report === "esignature") {
-      response = await fetch(
-        `http://localhost:8081/esignature/?startDate=${props.startDate}&endDate=${props.endDate}`
-      );
-      answer = await response.json();
-      setData(answer.data);
-      setIsLoading(false);
+      try {
+        response = await fetch(
+          `http://192.168.128.172:8081/esignature/?startDate=${props.startDate}&endDate=${props.endDate}`
+        );
+        answer = await response.json();
+        setData(answer.data);
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        toast.warn(
+          "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+          {
+            position: "bottom-left",
+          }
+        );
+      }
     } else if (props.report === "scanning") {
-      response = await fetch(
-        `http://localhost:8081/scanning/?startDate=${props.startDate}&endDate=${props.endDate}`
-      );
-      answer = await response.json();
-      setData(answer.data);
-      setIsLoading(false);
+      try {
+        response = await fetch(
+          `http://192.168.128.172:8081/scanning/?startDate=${props.startDate}&endDate=${props.endDate}`
+        );
+        answer = await response.json();
+        setData(answer.data);
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        toast.warn(
+          "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+          {
+            position: "bottom-left",
+          }
+        );
+      }
+    } else if (props.report === "longest") {
+      if (props.direction) {
+        try {
+          response = await fetch(
+            `http://192.168.128.172:8081/timeSite/?startDate=${props.startDate}&endDate=${props.endDate}&direction=${props.direction}`
+          );
+          answer = await response.json();
+          setData(answer.data);
+          setIsLoading(false);
+        } catch (error) {
+          setIsLoading(false);
+          toast.warn(
+            "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+            {
+              position: "bottom-left",
+            }
+          );
+        }
+      } else {
+        toast.warn(
+          "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+          {
+            position: "bottom-left",
+          }
+        );
+        setIsLoading(false);
+      }
+    } else if (props.report === "avgTime") {
+      if (props.direction) {
+        try {
+          response = await fetch(
+            `http://192.168.128.172:8081/avgTime/?startDate=${props.startDate}&endDate=${props.endDate}&direction=${props.direction}`
+          );
+          answer = await response.json();
+          setData(answer.data);
+          setIsLoading(false);
+        } catch (error) {
+          setIsLoading(false);
+          toast.warn(
+            "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+            {
+              position: "bottom-left",
+            }
+          );
+        }
+      } else {
+        toast.warn(
+          "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+          {
+            position: "bottom-left",
+          }
+        );
+        setIsLoading(false);
+      }
     }
   };
 
@@ -48,7 +123,9 @@ export const Button = (props) => {
       </button>
 
       <CSVLink
-        filename={`${props.report}-${props.startDate}-${props.endDate}.csv`}
+        filename={`${props.report}${
+          props.direction ? `-${props.direction}` : ""
+        }-${props.startDate}-${props.endDate}.csv`}
         data={data ? data : []}
         ref={csvInstance}
       ></CSVLink>

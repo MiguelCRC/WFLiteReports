@@ -50,3 +50,9 @@ h1 {
 .button-row {
   padding-top: 3rem;
 }
+
+.direction-row{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -133,6 +133,35 @@ async def report_avgTime(direction: str='Outbound', startDate: str=datetime.date
             return {"error": exc}
     return {"data": data}
 
+@app.get("/ediTracking", tags=["ediTracking"])
+async def report_ediTracking(startMonth: str=datetime.date, endMonth: str=datetime.date, customerId: int=47)->dict:
+    database_connection.ping(reconnect=True)
+    i=1
+    dataObject={}
+    data=[]
+    try:
+        token =  get_tplToken()
+        headers = {
+            'Host': config('TPL_HOST'),
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/json; charset=utf-8',
+            'Accept': 'application/json',
+            'Authorization': token,
+            'Accept-Encoding': 'gzip,deflate,sdch',
+            'Accept-Language': 'en-US,en;q=0.8'
+        }
+        tplEdiApp = (httpx.get(f"https://{config('TPL_HOST')}/inventory/receivers?pgsiz=500&detail=All&rql=ReadOnly.CustomerIdentifier.id=={customerId};ReadOnly.CreationDate=gt={startMonth};ReadOnly.CreationDate=lt={endMonth}",headers=headers, timeout=None)).json()
+        for tplLoad in tplEdiApp['ResourceList']:
+            if(len(tplLoad['SavedElements']) > 0):                
+                dataObject['bol']=tplLoad['ReferenceNum']
+                for element in tplLoad['SavedElements']:
+                    dataObject[element["Name"]]=element["Value"]
+                data.append(dataObject)
+                dataObject={}
+        return {"data": data}
+    except RequestValidationError as exc:
+        return {"error": exc}
+
 def get_tplToken():
     headers = {
         'Host': config('TPL_HOST'),

@@ -7,6 +7,7 @@ import Esignature from "./Esignature";
 import Scanning from "./Scanning";
 import LongestTime from "./LongestTime";
 import AvgTime from "./AvgTime";
+import EdiInfo from "./EdiInfo";
 
 class Main extends Component {
   render() {
@@ -30,6 +31,9 @@ class Main extends Component {
             <li>
               <NavLink to="avgTime">Avg Time</NavLink>
             </li>
+            <li>
+              <NavLink to="ediInfo">EDI Information</NavLink>
+            </li>
           </ul>
           <div className="content">
             <Routes>
@@ -38,6 +42,7 @@ class Main extends Component {
               <Route path="/scanning" element={<Scanning />} />
               <Route path="/longesTime" element={<LongestTime />} />
               <Route path="/avgTime" element={<AvgTime />} />
+              <Route path="/ediInfo" element={<EdiInfo />} />
             </Routes>
           </div>
         </div>

@@ -39,9 +39,9 @@ button > :is(span, img) {
   z-index: 3;
 }
 
-button > span:last-child {
+/* button > span:last-child {
   width: 106px;
-}
+} */
 
 button img {
   width: 26px;

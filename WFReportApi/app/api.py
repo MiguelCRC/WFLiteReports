@@ -133,6 +133,27 @@ async def report_avgTime(direction: str='Outbound', startDate: str=datetime.date
             return {"error": exc}
     return {"data": data}
 
+@app.get("/longTime", tags=["longTime"])
+async def report_listTime(direction: str='Outbound', startDate: str=datetime.date, endDate: str=datetime.date)->dict:
+    database_connection.ping(reconnect=True)
+    warehouseId=0
+    data=[]
+    for id in range(1,20):
+        try:
+            warehouseId=id
+            query=(config('QUERY_LONGTIME'))
+            cursor.execute(query,(warehouseId,direction,warehouseId,startDate,endDate,))
+            print(cursor)
+            for(warehouse, bol, longTime) in cursor:
+                if(longTime):
+                    hours = int(longTime/3600)
+                    minutes = ((longTime/3600)*60) % 60
+                    seconds = ((longTime/3600)*3600) % 60
+                    data.append({"warehouse": warehouse, "BOL":bol,"Time": "%02d:%02d:%02d" % (hours, minutes, seconds)})
+        except RequestValidationError as exc:
+            return {"error": exc}
+    return {"data": data}
+
 @app.get("/ediTracking", tags=["ediTracking"])
 async def report_ediTracking(startMonth: str=datetime.date, endMonth: str=datetime.date, customerId: int=47)->dict:
     database_connection.ping(reconnect=True)

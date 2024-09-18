@@ -105,7 +105,7 @@ async def report_siteTime(direction: str='Outbound',startDate: str=datetime.date
         warehouseId=id
         try:
             query=(config('QUERY_TIMESITE'))
-            cursor.execute(query,(warehouseId,direction,warehouseId,startDate,endDate,direction,warehouseId,startDate,endDate,))
+            cursor.execute(query,(warehouseId,direction,warehouseId,startDate,endDate,))
             for(warehouse, bol, longTime) in cursor:
                 if(longTime):
                     hours = int(longTime/3600)

@@ -44,7 +44,7 @@ async def report_inbound(
         cursor.execute(query, (startDate, endDate))
 
         data = []
-        for (bol, scheduledate, sendtodoorts, arrivedts, podsignrequests, departedts, podsigned, facilityName, driverphone) in cursor:
+        for (bol, scheduledate, sendtodoorts, arrivedts, podsignrequests, departedts, podsigned, facilityName, driverphone, custname) in cursor:
             data.append({
                 "bol": bol,
                 "scheduledate": scheduledate,
@@ -54,7 +54,8 @@ async def report_inbound(
                 "departedts": departedts,
                 "podsigned": podsigned,
                 "facilityName": facilityName,
-                "driverphone": driverphone
+                "driverphone": driverphone,
+                "customerName": custname
             })
         return {"data": data}
     except RequestValidationError as exc:

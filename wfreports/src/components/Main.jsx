@@ -7,6 +7,7 @@ import Esignature from "./Esignature";
 import Scanning from "./Scanning";
 import LongestTime from "./LongestTime";
 import AvgTime from "./AvgTime";
+import WhCusTime from "./WhCusTime";
 import EdiInfo from "./EdiInfo";
 
 class Main extends Component {
@@ -14,7 +15,7 @@ class Main extends Component {
     return (
       <HashRouter>
         <div>
-          <h1>Wareflex Lite Reporting Services</h1>
+          <h1 className="title">Wareflex Lite Reporting Services</h1>
           <ul className="header">
             <li>
               <NavLink to="/">Home</NavLink>
@@ -32,6 +33,9 @@ class Main extends Component {
               <NavLink to="avgTime">Avg Time</NavLink>
             </li>
             <li>
+              <NavLink to="whCustomTime">Customer by Warehouse Time</NavLink>
+            </li>
+            <li>
               <NavLink to="ediInfo">EDI Information</NavLink>
             </li>
           </ul>
@@ -42,6 +46,7 @@ class Main extends Component {
               <Route path="/scanning" element={<Scanning />} />
               <Route path="/longesTime" element={<LongestTime />} />
               <Route path="/avgTime" element={<AvgTime />} />
+              <Route path="/whCustomTime" element={<WhCusTime />} />
               <Route path="/ediInfo" element={<EdiInfo />} />
             </Routes>
           </div>

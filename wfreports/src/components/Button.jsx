@@ -137,6 +137,33 @@ export const Button = (props) => {
         );
         setIsLoading(false);
       }
+    } else if (props.report === "customTime") {
+      if (props.warehouseId !== "0") {
+        try {
+          response = await fetch(
+            `${API_URL}/customerTime/?startDate=${props.startDate}&endDate=${props.endDate}&warehouseId=${props.warehouseId}`
+          );
+          answer = await response.json();
+          setData(answer.data);
+          setIsLoading(false);
+        } catch (error) {
+          setIsLoading(false);
+          toast.warn(
+            "Warning: Please ensure that you are connected to the internet and/or have input your data accurately. !",
+            {
+              position: "bottom-left",
+            }
+          );
+        }
+      } else {
+        toast.warn(
+          "Warning: Please ensure to select a Warehouse to generate report !",
+          {
+            position: "bottom-left",
+          }
+        );
+        setIsLoading(false);
+      }
     }
   };
 

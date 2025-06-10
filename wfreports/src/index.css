@@ -10,6 +10,9 @@ ul,
 li {
   font-family: sans-serif;
 }
+.title{
+  color: white;
+}
 ul.header li {
   display: inline;
   list-style-type: none;

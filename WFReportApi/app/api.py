@@ -166,6 +166,23 @@ async def report_ediTracking(startMonth: str=datetime.date, endMonth: str=dateti
         return {"data": data}
     except RequestValidationError as exc:
         return {"error": exc}
+    
+@app.get("/customerTime", tags=["customerTime"])
+async def report_whCustomTime (startDate: str=datetime.date, endDate:str=datetime.date, warehouseId: int=1)->dict:
+    database_connection.ping(reconnect=True)
+    data=[]
+    try:
+        query = (config('QUERY_CUSTIME'))
+        cursor.execute(query,(warehouseId,warehouseId,startDate,endDate,))
+        for (warehouse, customer, customer_time) in cursor:
+            if(customer_time):
+                    hours = int(customer_time/3600)
+                    minutes = ((customer_time/3600)*60) % 60
+                    seconds = ((customer_time/3600)*3600) % 60
+                    data.append({"warehouse": warehouse,"customer":customer, "customer_time": "%02d:%02d:%02d" % (hours, minutes, seconds)})
+        return {"data":data}
+    except RequestValidationError as exc:
+        return {"error": exec}
 
 def get_tplToken():
     headers = {
@@ -199,8 +216,7 @@ def get_tplUsers(headers):
     
         for tplUser in response["ResourceList"]:
             if(tplUser["UiRoleIdentifiers"] and tplUser["FacilityIdentifiers"]):
-                userRolDict[tplUser["UserId"]]=tplUser["UiRoleIdentifiers"][0]["Name"]
-                
+                userRolDict[tplUser["UserId"]]=tplUser["UiRoleIdentifiers"][0]["Name"]                
     return (userRolDict)
 
 def get_tplFacilities(headers):

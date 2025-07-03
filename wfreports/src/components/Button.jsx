@@ -141,7 +141,7 @@ export const Button = (props) => {
       if (props.warehouseId !== "0") {
         try {
           response = await fetch(
-            `${API_URL}/customerTime/?startDate=${props.startDate}&endDate=${props.endDate}&warehouseId=${props.warehouseId}`
+            `${API_URL}/customerTime/?startDate=${props.startDate}&endDate=${props.endDate}&warehouseId=${props.warehouseId}&direction=${props.direction}`
           );
           answer = await response.json();
           setData(answer.data);

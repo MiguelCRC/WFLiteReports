@@ -168,12 +168,12 @@ async def report_ediTracking(startMonth: str=datetime.date, endMonth: str=dateti
         return {"error": exc}
     
 @app.get("/customerTime", tags=["customerTime"])
-async def report_whCustomTime (startDate: str=datetime.date, endDate:str=datetime.date, warehouseId: int=1)->dict:
+async def report_whCustomTime (startDate: str=datetime.date, endDate:str=datetime.date, warehouseId: int=1, direction: str='Outbound')->dict:
     database_connection.ping(reconnect=True)
     data=[]
     try:
         query = (config('QUERY_CUSTIME'))
-        cursor.execute(query,(warehouseId,warehouseId,startDate,endDate,))
+        cursor.execute(query,(warehouseId,direction,warehouseId,startDate,endDate,))
         for (warehouse, customer, customer_time) in cursor:
             if(customer_time):
                     hours = int(customer_time/3600)

@@ -6,7 +6,7 @@ import moment from "moment";
 const WhCusTime = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = useState("");
   const [warehouse, setWarehouse] = useState("0");
 
   const handleSelectionChange = (event) => {
@@ -21,6 +21,12 @@ const WhCusTime = () => {
         report.
       </p>
       <div className="container text-center">
+        <div className="col direction-row">
+          <RadioBtn
+            selection={value}
+            handleSelectionChange={handleSelectionChange}
+          />
+        </div>
         <div className="row">
           <div className="col">
             <p>Initial Date:</p>
@@ -66,6 +72,7 @@ const WhCusTime = () => {
             <Button
               report="customTime"
               warehouseId={warehouse}
+              direction={value}
               startDate={moment(startDate).format("YYYY-MM-DDT00:00:00")}
               endDate={moment(endDate).format("YYYY-MM-DDT23:59:00")}
             />
